@@ -1,0 +1,57 @@
+---
+# tasks file for install_docker
+- name: Updating the apt package index
+  apt: 
+    name: 
+    update_cache: yes
+    
+- name: Installing packages to allow apt to use a repository over HTTPS
+  apt: 
+    name: 
+      - ca-certificates
+      - curl
+      - gnupg
+    state: present
+
+- name: Creating /etc/apt/keyrings directory
+  file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Downloading the Docker GPG Key
+  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+  args:
+    executable: /bin/bash
+    
+#  uri:
+#    url: https://download.docker.com/linux/ubuntu/gpg
+#    dest: /etc/apt/keyrings/docker.gpg
+#    method: GET
+#    validate_certs: no
+#    return_content: no
+#  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+- name: Setting Permissions for the GPG Key
+  file:
+    path: /etc/apt/keyrings/docker.gpg
+    mode: '0644'
+    owner: root
+    group: root
+
+- name: Set up the repository
+  command: sh -c 'echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null'
+
+- name: Installing Docker Engine, containerd, and Docker Compose
+  apt: 
+    name: 
+      - docker-ce 
+      - docker-ce-cli 
+      - containerd.io 
+      - docker-buildx-plugin 
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+...

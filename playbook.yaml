@@ -1,0 +1,16 @@
+---
+- hosts: all
+  remote_user: root
+  #become: yes
+
+  tasks: 
+    - name: Install htop
+      apt:
+        name: htop
+        state: present
+        update_cache: yes
+
+#    - name: Init nginx
+#      service:
+#        name: nginx
+#        state: started
