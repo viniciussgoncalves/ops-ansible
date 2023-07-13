@@ -1,8 +1,5 @@
 ---
 # tasks file for install_crowdsec-bouncer
-- name: Set up taks vars
-  include_vars: "{{ externalVariables }}"
-
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: yes
