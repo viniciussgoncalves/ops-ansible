@@ -1,0 +1,95 @@
+---
+# tasks file for install_crowdsec-bouncer
+- name: Set up taks vars
+  include_vars: "{{ externalVariables }}"
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  when: ansible_pkg_mgr == "apt"
+    
+- name: Update yum cache
+  ansible.builtin.yum:
+    update_cache: yes
+  when: ansible_pkg_mgr == "yum"
+    
+- name: Update dnf cache
+  ansible.builtin.dnf:
+    update_cache: yes
+  when: ansible_pkg_mgr == "dnf"
+
+- name: Installing CrowdSec Dependencies
+  ansible.builtin.package:
+    name: 
+      - curl
+    state: present
+
+- name: Installing CrowdSec Repositories for Ubuntu
+  shell: curl -s https://packagecloud.io/install/repositories/crowdsec/crowdsec/script.deb.sh | sudo bash
+  args:
+    executable: /bin/bash
+  when: ansible_distribution == "Ubuntu"
+
+- name: Installing CrowdSec Repositories for CentOS
+  shell: curl -s https://packagecloud.io/install/repositories/crowdsec/crowdsec/script.rpm.sh | sudo bash
+  args:
+    executable: /bin/bash
+  when: ansible_distribution == "CentOS"
+
+- name: Installing CrowdSec Repositories for Amazon Linux
+  shell: curl -s https://packagecloud.io/install/repositories/crowdsec/crowdsec/script.rpm.sh | sudo bash
+  args:
+    executable: /bin/bash
+  when: ansible_distribution == "Amazon" 
+
+- name: Installing CrowdSec Engine and Bouncer
+  ansible.builtin.package:
+    name:
+      - crowdsec 
+      - crowdsec-firewall-bouncer-iptables
+    state: present
+
+- name: Copy config.yaml to Bouncer folder
+  ansible.builtin.copy:
+    src: config.yaml
+    dest: /etc/crowdsec/config.yaml
+    owner: root
+    group: root
+    mode: u=rw
+    backup: yes
+
+- name: Installing CrowdSecurity Wordpress
+  shell: cscli collections install crowdsecurity/wordpress
+  args:
+    executable: /bin/bash
+
+- name: Enable service crowdsec
+  ansible.builtin.service:
+    name: crowdsec
+    enabled: yes
+
+- name: Restart service crowdsec
+  ansible.builtin.service:
+    name: crowdsec
+    state: restarted
+
+- name: Registering Bouncer
+  shell: cscli lapi register -u https://crowdsec.apiki.com --machine {{ domain }}
+  args:
+    executable: /bin/bash
+
+- name: Restart service crowdsec
+  ansible.builtin.service:
+    name: crowdsec
+    state: reloaded
+
+- name: Stop service fail2ban
+  ansible.builtin.service:
+    name: fail2ban.service
+    state: stopped
+
+- name: Disable service fail2ban
+  ansible.builtin.service:
+    name: fail2ban.service
+    enabled: false    
+...

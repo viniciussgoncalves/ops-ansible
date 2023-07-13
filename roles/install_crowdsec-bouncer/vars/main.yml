@@ -1,0 +1,6 @@
+---
+# vars file for install_crowdsec-bouncer
+dest_corwdsec_config: /etc/corwdsec/config.yaml
+url_api: https://crowdsec.apiki.com
+domain:
+...

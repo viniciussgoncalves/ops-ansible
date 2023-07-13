@@ -25,15 +25,7 @@
   shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
   args:
     executable: /bin/bash
-    
-#  uri:
-#    url: https://download.docker.com/linux/ubuntu/gpg
-#    dest: /etc/apt/keyrings/docker.gpg
-#    method: GET
-#    validate_certs: no
-#    return_content: no
-#  shell: curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-
+ 
 - name: Setting Permissions for the GPG Key
   file:
     path: /etc/apt/keyrings/docker.gpg

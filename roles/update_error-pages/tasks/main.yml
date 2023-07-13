@@ -1,0 +1,27 @@
+---
+# tasks file for update_error-pages
+- name: Check if directory exists
+  ansible.builtin.stat:
+    path: /home/developer/webserver/errors_html
+  register: stat_dir
+
+- name: Display result
+  ansible.builtin.debug:
+    msg: "The directory exists."
+  when: stat_dir.stat.exists
+
+- name: Display result
+  ansible.builtin.debug:
+    msg: "The directory does not exist."
+  when: not stat_dir.stat.exists
+
+- name: Copy images to error folder
+  ansible.builtin.copy:
+    src: images/
+    dest: /home/developer/webserver/errors_html/
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+    backup: yes
+  when: stat_dir.stat.exists
+...
